@@ -1,28 +1,15 @@
 package main
 
 import (
-	"log"
-	"os"
 	"unrealbot/cmd/bot"
+	"unrealbot/config"
 	"unrealbot/internal/chat"
 	"unrealbot/internal/payments"
-
-	"github.com/BurntSushi/toml"
 
 	tele "gopkg.in/telebot.v3"
 )
 
-// Config - структура конфига
-type Config struct {
-	PaymentProviderAPIKey string
-	APIToken              string
-	APIUrl                string
-	BotID                 string
-	BotToken              string
-	ChannelID             int64
-	GenAPIKey             string
-	GenAPIUrl             string
-}
+
 
 type checkoutHandler struct {
 	bot *tele.Bot
@@ -38,23 +25,9 @@ var (
 	btnSubscribe = menu.Text("🎸 Подписаться")
 )
 
-func loadConfig(filePath string) (*Config, error) {
-	cfg := &Config{}
-	if _, err := os.Stat(filePath); err != nil {
-		return nil, err
-	}
-	if _, err := toml.DecodeFile(filePath, cfg); err != nil {
-		return nil, err
-	}
-	return cfg, nil
-}
-
 func main() {
-	configFilePath := "config/local.toml"
-	cfg, err := loadConfig(configFilePath)
-	if err != nil {
-		log.Fatalf("Ошибка загрузки конфигурации: %v", err)
-	}
+
+	cfg := config.MustLoad()
 
 	channelID = cfg.ChannelID
 
@@ -64,8 +37,6 @@ func main() {
 		Bot:                   bot.InitBot(cfg.BotToken),
 		BotID:                 cfg.BotID,
 		PaymentProviderAPIKey: cfg.PaymentProviderAPIKey,
-		GenAPIUrl:             cfg.GenAPIUrl,
-		GenAPIKey:             cfg.GenAPIKey,
 	}
 
 	defer unrealBot.Bot.Stop()

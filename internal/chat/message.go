@@ -56,7 +56,7 @@ func (h *Handler) HandleMessage(ctx tele.Context) error {
 		return fmt.Errorf("Ошибка маршалинга: %w", err)
 	}
 
-	req, err := createPostRequest(h.bot.GenAPIUrl, h.bot.GenAPIKey, payloadBytes)
+	req, err := createPostRequest(h.bot.APIUrl, h.bot.APIToken, payloadBytes)
 	if err != nil {
 		return err
 	}
