@@ -1,0 +1,167 @@
+package main
+
+import (
+	"log"
+	"os"
+	"unrealbot/cmd/bot"
+	"unrealbot/internal/chat"
+	"unrealbot/internal/payments"
+
+	"github.com/BurntSushi/toml"
+
+	tele "gopkg.in/telebot.v3"
+)
+
+// Config - структура конфига
+type Config struct {
+	PaymentProviderAPIKey string
+	APIToken              string
+	APIUrl                string
+	BotID                 string
+	BotToken              string
+	ChannelID             int64
+	GenAPIKey             string
+	GenAPIUrl             string
+}
+
+type checkoutHandler struct {
+	bot *tele.Bot
+}
+
+var (
+	channelID    int64
+	menu         = &tele.ReplyMarkup{ResizeKeyboard: true}
+	guestMenu    = &tele.ReplyMarkup{ResizeKeyboard: true}
+	emptyMenu    = &tele.ReplyMarkup{RemoveKeyboard: true}
+	btnPromo     = menu.URL("💥 The Absolute Basstards", "@tabdnb")
+	btnPay       = menu.Text("📢 Оплатить подписку")
+	btnSubscribe = menu.Text("🎸 Подписаться")
+)
+
+func loadConfig(filePath string) (*Config, error) {
+	cfg := &Config{}
+	if _, err := os.Stat(filePath); err != nil {
+		return nil, err
+	}
+	if _, err := toml.DecodeFile(filePath, cfg); err != nil {
+		return nil, err
+	}
+	return cfg, nil
+}
+
+func main() {
+	configFilePath := "config/local.toml"
+	cfg, err := loadConfig(configFilePath)
+	if err != nil {
+		log.Fatalf("Ошибка загрузки конфигурации: %v", err)
+	}
+
+	channelID = cfg.ChannelID
+
+	unrealBot := bot.UnrealBot{
+		APIToken:              cfg.APIToken,
+		APIUrl:                cfg.APIUrl,
+		Bot:                   bot.InitBot(cfg.BotToken),
+		BotID:                 cfg.BotID,
+		PaymentProviderAPIKey: cfg.PaymentProviderAPIKey,
+		GenAPIUrl:             cfg.GenAPIUrl,
+		GenAPIKey:             cfg.GenAPIKey,
+	}
+
+	defer unrealBot.Bot.Stop()
+
+	setupMenu()
+
+	registerHandlers(unrealBot)
+	unrealBot.Bot.Start()
+}
+
+func setupMenu() {
+	menu.Reply(
+		menu.Row(btnPromo),
+	)
+	guestMenu.Reply(
+		// Кнопка для оплаты
+		// guestMenu.Row(btnPay),
+
+		// Кнопка для подписки
+		guestMenu.Row(btnSubscribe),
+	)
+}
+
+func registerHandlers(unrealBot bot.UnrealBot) {
+
+	checkoutHandler := payments.NewCheckoutHandler(&unrealBot)
+	invoiceHandler := payments.NewInvoiceHandler(&unrealBot)
+	messageHandler := chat.NewMessageHandler(&unrealBot)
+
+	// /-- Только для подписчиков
+	memberOnly := unrealBot.Bot.Group()
+
+	memberOnly.Use(CheckMembership)
+
+	memberOnly.Handle("/start", func(c tele.Context) error {
+		return c.Send("Привет, "+c.Sender().FirstName+"! 👋", emptyMenu)
+	})
+
+	memberOnly.Handle(tele.OnContact, unrealBot.ContactHandler)
+	memberOnly.Handle(tele.OnText, messageHandler.HandleMessage)
+	// --/
+
+	unrealBot.Bot.Handle(tele.OnCheckout, checkoutHandler.HandleCheckout)
+
+	unrealBot.Bot.Handle(&btnPay, invoiceHandler.HandleInvoice)
+
+	unrealBot.Bot.Handle(&btnSubscribe, func(c tele.Context) error {
+		channel := &tele.Chat{ID: channelID, Type: "privatechannel"}
+		link, err := c.Bot().InviteLink(channel)
+		if err != nil {
+			return c.Send("Произошла ошибка при формировании пригласительной ссылки.")
+		}
+		return c.Send(link)
+	})
+
+	// /-- В случае успешного платежа отправляем уникальную пригласительную ссылку на канал
+	unrealBot.Bot.Handle(tele.OnPayment, func(c tele.Context) error {
+		if c.Message().Payment != nil {
+			channel := &tele.Chat{ID: channelID, Type: "privatechannel"}
+			link, err := c.Bot().InviteLink(channel)
+			if err != nil {
+				return c.Send("Произошла ошибка при формировании пригласительной ссылки.")
+			}
+			return c.Send(link)
+		}
+		return nil
+	})
+	// --/
+
+}
+
+// --- Мидлвейры --- /
+
+// CheckMembership - мидлвейр, проверяет подписку на канал
+func CheckMembership(next tele.HandlerFunc) tele.HandlerFunc {
+	return func(c tele.Context) error {
+		user := c.Recipient()
+		channel := &tele.Chat{ID: channelID}
+
+		chatMember, err := c.Bot().ChatMemberOf(channel, user)
+
+		if err != nil {
+			return c.Send("Ошибка при проверке подписки: " + err.Error())
+		}
+
+		if isMember(chatMember) {
+			return next(c)
+		}
+
+		// return c.Send("У вас нет доступа к этому боту.", guestMenu)
+		return c.Send("У вас нет доступа к этому боту. Свяжитесь с администратором: @frntbck", emptyMenu)
+	}
+}
+
+func isMember(chatMember *tele.ChatMember) bool {
+	return chatMember.Role == tele.Member || chatMember.Role == tele.Administrator || chatMember.Role == tele.Creator
+}
+
+// --/
