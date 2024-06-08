@@ -29,7 +29,15 @@ func handleNoAccess(c tele.Context, adminUserID int64) error {
 	menu.Reply(menu.Row(btnAccessRequest))
 
 	c.Bot().Handle(&btnAccessRequest, func(c tele.Context) error {
-		_, err := c.Bot().Send(&tele.User{ID: adminUserID}, "Получен запрос на доступ от пользователя @"+c.Sender().Username)
+
+		var senderID = c.Sender().Username
+		if c.Sender().Username == "" || c.Sender().Username == " " || c.Sender().Username == "null" {
+			senderID = string(rune(c.Sender().ID))
+			c.ForwardTo(&tele.Chat{ID: adminUserID})
+			return c.Send("У вас скрытый профиль или отсутствует имя пользователя (корокое имя) в настройках Telegram.\n\nСвяжитесь с администратором @frntbck напрямую.")
+		}
+
+		_, err := c.Bot().Send(&tele.User{ID: adminUserID}, "Получен запрос на доступ от пользователя @"+senderID)
 		if err != nil {
 			return c.Send("Ошибка при отправке запроса: " + err.Error())
 		}
