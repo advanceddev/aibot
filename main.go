@@ -36,6 +36,7 @@ func main() {
 		Bot:                   bot.InitBot(cfg.BotToken),
 		BotID:                 cfg.BotID,
 		PaymentProviderAPIKey: cfg.PaymentProviderAPIKey,
+		ChannelID:             cfg.ChannelID,
 	}
 
 	defer unrealBot.Bot.Stop()
@@ -90,18 +91,7 @@ func registerHandlers(unrealBot bot.UnrealBot) {
 		return c.Send(link)
 	})
 
-	// TODO: вынести хэндлер в отдельный модуль
 	// /-- В случае успешного платежа отправляем уникальную пригласительную ссылку на канал
-	unrealBot.Bot.Handle(tele.OnPayment, func(c tele.Context) error {
-		if c.Message().Payment != nil {
-			channel := &tele.Chat{ID: channelID, Type: "privatechannel"}
-			link, err := c.Bot().InviteLink(channel)
-			if err != nil {
-				return c.Send("Произошла ошибка при формировании пригласительной ссылки.")
-			}
-			return c.Send(link)
-		}
-		return nil
-	})
+	unrealBot.Bot.Handle(tele.OnPayment, invoiceHandler.HandlePaymentSuccess)
 
 }

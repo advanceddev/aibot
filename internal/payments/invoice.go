@@ -13,6 +13,19 @@ func NewInvoiceHandler(bot *bot.UnrealBot) *Handler {
 	return &Handler{bot: bot}
 }
 
+// HandlePaymentSuccess - обработчик успешного платежа
+func (h *Handler) HandlePaymentSuccess(ctx tele.Context) error {
+	if ctx.Message().Payment != nil {
+		channel := &tele.Chat{ID: h.bot.ChannelID, Type: "privatechannel"}
+		link, err := ctx.Bot().InviteLink(channel)
+		if err != nil {
+			return ctx.Send("Произошла ошибка при формировании пригласительной ссылки.")
+		}
+		return ctx.Send(link)
+	}
+	return nil
+}
+
 // HandleInvoice - создание и отправка инвойса
 func (h *Handler) HandleInvoice(ctx tele.Context) error {
 	paymentID := int64(1) // here you need to assign a payment ID
