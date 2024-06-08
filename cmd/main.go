@@ -2,10 +2,10 @@ package main
 
 import (
 	"unrealbot/cmd/bot"
-	"unrealbot/config"
-	"unrealbot/internal/chat"
+	"unrealbot/internal/config"
+	"unrealbot/internal/handlers/chat"
+	"unrealbot/internal/handlers/payments"
 	"unrealbot/internal/middlewares"
-	"unrealbot/internal/payments"
 
 	tele "gopkg.in/telebot.v3"
 	"gopkg.in/telebot.v3/middleware"

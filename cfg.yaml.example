@@ -1,0 +1,12 @@
+# Rename cfg.yaml.example -> cfg.yaml
+# Replace / fill the CHANNEL_ID, ADMIN_USER_ID, PAYMENT_PROVIDER_API_KEY, API_TOKEN
+
+# telegram @botfather
+BOT_TOKEN: ''
+CHANNEL_ID: -1111111111111
+ADMIN_USER_ID: 111111111
+PAYMENT_PROVIDER_API_KEY: ''
+
+# gen-api.ru
+API_TOKEN: ''
+API_URL: 'https://api.gen-api.ru/api/v1'
