@@ -18,14 +18,14 @@ func NewCommandHandler(bot *bot.UnrealBot) *Handler {
 // StartHandler обрабатывает команду /start
 func (h *Handler) StartHandler(ctx tele.Context) error {
 	menu := &tele.ReplyMarkup{RemoveKeyboard: true}
-	return ctx.Send("Привет, "+ctx.Sender().FirstName+"! 👋", menu)
+	return ctx.Send(utils.SumStrings("Привет, ", ctx.Sender().FirstName, "! 👋"), menu)
 }
 
 // ContactHandler обрабатывает команду /contact
 func (h *Handler) ContactHandler(ctx tele.Context) error {
 	ctx.Notify("typing")
 	phone := ctx.Message().Contact.PhoneNumber
-	return ctx.Send("Записал твой номер: " + phone + "!")
+	return ctx.Send(utils.SumStrings("Записал твой номер: ", phone, "!"))
 }
 
 // SubscribeHandler генерирует уникальную пригласительную ссылку на группу
@@ -40,14 +40,14 @@ func (h *Handler) SubscribeHandler(ctx tele.Context) error {
 
 // BalanceHandler обрабатывает команду /balance
 func (h *Handler) BalanceHandler(ctx tele.Context) error {
-	url := h.bot.APIUrl + "/user"
+	url := utils.SumStrings(h.bot.APIUrl, "/user")
 	parsedURL, err := utils.SanitizeURL(url)
 	req, err := http.NewRequest("GET", parsedURL, nil)
 	if err != nil {
 		return ctx.Send("Произошла ошибка при создании запроса: ", err.Error())
 	}
 
-	req.Header.Add("Authorization", "Bearer "+h.bot.APIToken)
+	req.Header.Add("Authorization", utils.SumStrings("Bearer ", h.bot.APIToken))
 
 	client := &http.Client{Timeout: time.Second * 10}
 	res, err := client.Do(req)
@@ -67,7 +67,5 @@ func (h *Handler) BalanceHandler(ctx tele.Context) error {
 	}
 
 	menu := &tele.ReplyMarkup{InlineKeyboard: [][]tele.InlineButton{{btnRefill}}}
-
-	return ctx.Send("💰 Баланс GenAPI: "+message.Balance+"₽", menu)
-
+	return ctx.Send(utils.SumStrings("💰 Баланс GenAPI: ", message.Balance, "₽"), menu)
 }

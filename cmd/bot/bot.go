@@ -11,6 +11,7 @@ func InitBot(token string) *tele.Bot {
 	pref := tele.Settings{
 		Token:  token,
 		Poller: &tele.LongPoller{Timeout: 10},
+		ParseMode: tele.ModeMarkdown,
 	}
 
 	b, err := tele.NewBot(pref)

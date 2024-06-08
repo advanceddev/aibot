@@ -1,6 +1,8 @@
 package middlewares
 
 import (
+	"unrealbot/internal/utils"
+
 	tele "gopkg.in/telebot.v3"
 )
 
@@ -37,9 +39,9 @@ func handleNoAccess(c tele.Context, adminUserID int64) error {
 			return c.Send("У вас скрытый профиль или отсутствует имя пользователя (корокое имя) в настройках Telegram.\n\nСвяжитесь с администратором @frntbck напрямую.")
 		}
 
-		_, err := c.Bot().Send(&tele.User{ID: adminUserID}, "Получен запрос на доступ от пользователя @"+senderID)
+		_, err := c.Bot().Send(&tele.User{ID: adminUserID}, utils.SumStrings("Получен запрос на доступ от пользователя @", senderID))
 		if err != nil {
-			return c.Send("Ошибка при отправке запроса: " + err.Error())
+			return c.Send(utils.SumStrings("Ошибка при отправке запроса: ", err.Error()))
 		}
 		c.Send("Запрос отправлен администратору.")
 		return c.Delete()
@@ -54,7 +56,7 @@ func checkSubscription(channelID int64, c tele.Context) (bool, error) {
 
 	chatMember, err := c.Bot().ChatMemberOf(channel, user)
 	if err != nil {
-		return false, c.Send("Ошибка при проверке подписки: " + err.Error())
+		return false, c.Send(utils.SumStrings("Ошибка при проверке подписки: ", err.Error()))
 	}
 
 	return isMember(chatMember.Role), nil

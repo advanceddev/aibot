@@ -29,7 +29,9 @@ func main() {
 
 	registerHandlers(unrealBot)
 	unrealBot.Bot.Start()
+
 }
+
 
 func registerHandlers(unrealBot bot.UnrealBot) {
 
@@ -40,7 +42,7 @@ func registerHandlers(unrealBot bot.UnrealBot) {
 
 	// Создаем группу для админов и закрываем ее мидлвэйром
 	adminOnly := unrealBot.Bot.Group()
-	adminOnly.Use(middleware.Whitelist(unrealBot.AdminUserID)) 
+	adminOnly.Use(middleware.Whitelist(unrealBot.AdminUserID))
 	adminOnly.Handle("/balance", commandHandler.BalanceHandler) // Запросить текущий баланс командой /balance
 
 	// Создаем группу для пользователей и закрываем ее мидлвэйром
@@ -48,12 +50,12 @@ func registerHandlers(unrealBot bot.UnrealBot) {
 	memberOnly.Use(middlewares.CheckMembership(unrealBot.ChannelID, unrealBot.AdminUserID)) // Проверить подписку и запросить доступ
 
 	// Хэндлеры группы membersOnly
-	memberOnly.Handle("/start", commandHandler.StartHandler) // Обработчик команды /start
+	memberOnly.Handle("/start", commandHandler.StartHandler)         // Обработчик команды /start
 	memberOnly.Handle(tele.OnContact, commandHandler.ContactHandler) // Обработчик на отправленный Контакт
-	memberOnly.Handle(tele.OnText, messageHandler.HandleMessage) // Обработчик текстового сообщения
+	memberOnly.Handle(tele.OnText, messageHandler.HandleMessage)     // Обработчик текстового сообщения
 
 	// Публичные хэндлеры
-	unrealBot.Bot.Handle(tele.OnCheckout, checkoutHandler.HandleCheckout) // Обработчик созданного платежа
+	unrealBot.Bot.Handle(tele.OnCheckout, checkoutHandler.HandleCheckout)     // Обработчик созданного платежа
 	unrealBot.Bot.Handle(tele.OnPayment, invoiceHandler.HandlePaymentSuccess) // Обработчик успешного платежа
 
 }

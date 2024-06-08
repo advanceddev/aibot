@@ -76,7 +76,7 @@ func (h *Handler) HandleMessage(ctx tele.Context) error {
 	promoMessage := GetPromoString()
 
 	// Отправляем сообщение и рекламу
-	return ctx.Send(answerContent + promoMessage)
+	return ctx.Send(utils.SumStrings(answerContent, promoMessage))
 }
 
 // createPostRequest создает POST запрос к API
@@ -85,14 +85,16 @@ func createPostRequest(apiURL, apiKey string, payload []byte) (*http.Request, er
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("POST", parsedURL+"/networks/chat-gpt-4-turbo", bytes.NewBuffer(payload))
+	url := utils.SumStrings(parsedURL, "/networks/chat-gpt-4-turbo")
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
+
 	if err != nil {
 		return nil, fmt.Errorf("Не удалось создать запрос: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", "Bearer "+apiKey)
+	req.Header.Set("Authorization", utils.SumStrings("Bearer ", apiKey))
 
 	return req, nil
 }

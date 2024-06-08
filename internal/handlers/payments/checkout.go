@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"unrealbot/cmd/bot"
+	"unrealbot/internal/utils"
 
 	tele "gopkg.in/telebot.v3"
 )
@@ -25,9 +26,7 @@ func (h *Handler) sendErrorMessage(pre *tele.PreCheckoutQuery) {
 	_, sendErr := h.bot.Bot.Send(
 		pre.Sender,
 		fmt.Sprintf(
-			"Ошибка при проведении платежа. "+
-				"Свяжитесь с администратором.\n\n Счет ID: %s",
-			pre.ID,
+			utils.SumStrings("Ошибка при проведении платежа. Счет ID:", pre.ID),
 		),
 	)
 	if sendErr != nil {
