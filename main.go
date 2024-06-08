@@ -4,12 +4,11 @@ import (
 	"unrealbot/cmd/bot"
 	"unrealbot/config"
 	"unrealbot/internal/chat"
+	"unrealbot/internal/middlewares"
 	"unrealbot/internal/payments"
 
 	tele "gopkg.in/telebot.v3"
 )
-
-
 
 type checkoutHandler struct {
 	bot *tele.Bot
@@ -65,24 +64,23 @@ func registerHandlers(unrealBot bot.UnrealBot) {
 	checkoutHandler := payments.NewCheckoutHandler(&unrealBot)
 	invoiceHandler := payments.NewInvoiceHandler(&unrealBot)
 	messageHandler := chat.NewMessageHandler(&unrealBot)
+	commandHandler := chat.NewCommandHandler(&unrealBot)
 
-	// /-- Только для подписчиков
+	// Создаем группу хэндлеров
 	memberOnly := unrealBot.Bot.Group()
 
-	memberOnly.Use(CheckMembership)
+	// Добавляем мидлвару к группе хэндлеров
+	memberOnly.Use(middlewares.CheckMembership)
 
-	memberOnly.Handle("/start", func(c tele.Context) error {
-		return c.Send("Привет, "+c.Sender().FirstName+"! 👋", emptyMenu)
-	})
-
-	memberOnly.Handle(tele.OnContact, unrealBot.ContactHandler)
+	// Хэндлеры группы membersOnly
+	memberOnly.Handle("/start", commandHandler.StartHandler)
+	memberOnly.Handle(tele.OnContact, commandHandler.ContactHandler)
 	memberOnly.Handle(tele.OnText, messageHandler.HandleMessage)
-	// --/
 
 	unrealBot.Bot.Handle(tele.OnCheckout, checkoutHandler.HandleCheckout)
-
 	unrealBot.Bot.Handle(&btnPay, invoiceHandler.HandleInvoice)
 
+	// TODO: вынести хэндлер в отдельный модуль
 	unrealBot.Bot.Handle(&btnSubscribe, func(c tele.Context) error {
 		channel := &tele.Chat{ID: channelID, Type: "privatechannel"}
 		link, err := c.Bot().InviteLink(channel)
@@ -92,6 +90,7 @@ func registerHandlers(unrealBot bot.UnrealBot) {
 		return c.Send(link)
 	})
 
+	// TODO: вынести хэндлер в отдельный модуль
 	// /-- В случае успешного платежа отправляем уникальную пригласительную ссылку на канал
 	unrealBot.Bot.Handle(tele.OnPayment, func(c tele.Context) error {
 		if c.Message().Payment != nil {
@@ -104,35 +103,5 @@ func registerHandlers(unrealBot bot.UnrealBot) {
 		}
 		return nil
 	})
-	// --/
 
 }
-
-// --- Мидлвейры --- /
-
-// CheckMembership - мидлвейр, проверяет подписку на канал
-func CheckMembership(next tele.HandlerFunc) tele.HandlerFunc {
-	return func(c tele.Context) error {
-		user := c.Recipient()
-		channel := &tele.Chat{ID: channelID}
-
-		chatMember, err := c.Bot().ChatMemberOf(channel, user)
-
-		if err != nil {
-			return c.Send("Ошибка при проверке подписки: " + err.Error())
-		}
-
-		if isMember(chatMember) {
-			return next(c)
-		}
-
-		// return c.Send("У вас нет доступа к этому боту.", guestMenu)
-		return c.Send("У вас нет доступа к этому боту. Свяжитесь с администратором: @frntbck", emptyMenu)
-	}
-}
-
-func isMember(chatMember *tele.ChatMember) bool {
-	return chatMember.Role == tele.Member || chatMember.Role == tele.Administrator || chatMember.Role == tele.Creator
-}
-
-// --/

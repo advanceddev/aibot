@@ -20,13 +20,3 @@ func InitBot(token string) *tele.Bot {
 
 	return b
 }
-
-// ContactHandler - обработчик входящих контактных данных пользователя
-func (bot *UnrealBot) ContactHandler(ctx tele.Context) error {
-
-	ctx.Notify("typing")
-	phone := ctx.Message().Contact.PhoneNumber
-	ctx.Send("Записал твой номер: " + phone + "!")
-
-	return nil
-}

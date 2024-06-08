@@ -73,19 +73,3 @@ type GenAIApiChoice struct {
 		Role    string `json:"role"`
 	} `json:"message"`
 }
-
-// CozeResponseMessage - структура сообщения в ответе Coze API
-type CozeResponseMessage struct {
-	Role        string `json:"role"`
-	Type        string `json:"type"`
-	Content     string `json:"content"`
-	ContentType string `json:"content_type"`
-}
-
-// CozeAPIResponse - структура ответа Coze API
-type CozeAPIResponse struct {
-	Messages       []CozeResponseMessage `json:"messages"`
-	ConversationID string                `json:"conversation_id"`
-	Code           int                   `json:"code"`
-	Msg            string                `json:"msg"`
-}
