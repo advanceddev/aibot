@@ -10,7 +10,6 @@ import (
 
 // Config - Структура конфигурации приложения
 type Config struct {
-	Env                   string `yaml:"ENV" env-default:"local" env:"ENV"`
 	BotToken              string `yaml:"BOT_TOKEN" env-required:"true" env:"BOT_TOKEN"`
 	BotID                 string `yaml:"BOT_ID" env:"BOT_ID"`
 	ChannelID             int64  `yaml:"CHANNEL_ID" env-required:"true" env:"CHANNEL_ID"`

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 	"unrealbot/cmd/bot"
+	"unrealbot/internal/utils"
 
 	tele "gopkg.in/telebot.v3"
 )
@@ -40,8 +41,8 @@ func (h *Handler) SubscribeHandler(ctx tele.Context) error {
 // BalanceHandler обрабатывает команду /balance
 func (h *Handler) BalanceHandler(ctx tele.Context) error {
 	url := h.bot.APIUrl + "/user"
-
-	req, err := http.NewRequest("GET", url, nil)
+	parsedURL, err := utils.SanitizeURL(url)
+	req, err := http.NewRequest("GET", parsedURL, nil)
 	if err != nil {
 		return ctx.Send("Произошла ошибка при создании запроса: ", err.Error())
 	}

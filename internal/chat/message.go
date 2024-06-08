@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"unrealbot/cmd/bot"
+	"unrealbot/internal/utils"
 
 	tele "gopkg.in/telebot.v3"
 )
@@ -79,8 +80,12 @@ func (h *Handler) HandleMessage(ctx tele.Context) error {
 }
 
 // createPostRequest создает POST запрос к API
-func createPostRequest(url, apiKey string, payload []byte) (*http.Request, error) {
-	req, err := http.NewRequest("POST", url + "/networks/chat-gpt-4-turbo", bytes.NewBuffer(payload))
+func createPostRequest(apiURL, apiKey string, payload []byte) (*http.Request, error) {
+	parsedURL, err := utils.SanitizeURL(apiURL)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest("POST", parsedURL+"/networks/chat-gpt-4-turbo", bytes.NewBuffer(payload))
 	if err != nil {
 		return nil, fmt.Errorf("Не удалось создать запрос: %w", err)
 	}

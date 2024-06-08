@@ -2,6 +2,9 @@
 ## explicit; go 1.18
 github.com/BurntSushi/toml
 github.com/BurntSushi/toml/internal
+# github.com/PuerkitoBio/purell v1.2.1
+## explicit; go 1.21
+github.com/PuerkitoBio/purell
 # github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 ## explicit
 # github.com/ilyakaznacheev/cleanenv v1.5.0
@@ -14,6 +17,16 @@ github.com/joho/godotenv
 ## explicit
 # github.com/stretchr/testify v1.9.0
 ## explicit; go 1.17
+# golang.org/x/net v0.17.0
+## explicit; go 1.17
+golang.org/x/net/idna
+# golang.org/x/text v0.13.0
+## explicit; go 1.17
+golang.org/x/text/secure/bidirule
+golang.org/x/text/transform
+golang.org/x/text/unicode/bidi
+golang.org/x/text/unicode/norm
+golang.org/x/text/width
 # gopkg.in/telebot.v3 v3.2.1
 ## explicit; go 1.13
 gopkg.in/telebot.v3
