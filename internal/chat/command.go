@@ -60,5 +60,13 @@ func (h *Handler) BalanceHandler(ctx tele.Context) error {
 		return ctx.Send("Произошла ошибка при декодировании JSON: ", err.Error())
 	}
 
-	return ctx.Send("💰 Баланс GenAPI: " + message.Balance + "₽\n\nПополнить: https://gen-api.ru/account/billing")
+	btnRefill := tele.InlineButton{
+		Text: "Пополнить",
+		URL:  "https://gen-api.ru/account/billing",
+	}
+
+	menu := &tele.ReplyMarkup{InlineKeyboard: [][]tele.InlineButton{{btnRefill}}}
+
+	return ctx.Send("💰 Баланс GenAPI: "+message.Balance+"₽", menu)
+
 }
