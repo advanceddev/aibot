@@ -17,6 +17,7 @@ type Config struct {
 	PaymentProviderAPIKey string `yaml:"PAYMENT_PROVIDER_API_KEY" env-required:"true" env:"PAYMENT_PROVIDER_API_KEY"`
 	APIToken              string `yaml:"API_TOKEN" env-required:"true" env:"API_TOKEN"`
 	APIUrl                string `yaml:"API_URL" env-required:"true" env:"API_URL"`
+	AdminUserID           int64  `yaml:"ADMIN_USER_ID" env-required:"true" env:"ADMIN_USER_ID"`
 }
 
 const (

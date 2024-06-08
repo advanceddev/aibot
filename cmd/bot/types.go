@@ -10,4 +10,5 @@ type UnrealBot struct {
 	APIUrl                string
 	PaymentProviderAPIKey string
 	ChannelID             int64
+	AdminUserID           int64
 }

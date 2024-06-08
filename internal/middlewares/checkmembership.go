@@ -5,20 +5,39 @@ import (
 )
 
 // CheckMembership - мидлвейр, проверяет подписку на канал
-func CheckMembership(channelID int64) tele.MiddlewareFunc {
+func CheckMembership(channelID, adminUserID int64) tele.MiddlewareFunc {
 	return func(next tele.HandlerFunc) tele.HandlerFunc {
 		return func(c tele.Context) error {
+
 			isMember, err := checkSubscription(channelID, c)
 			if err != nil {
 				return err
 			}
+
 			if !isMember {
-				menu := &tele.ReplyMarkup{RemoveKeyboard: true}
-				return c.Send("У вас нет доступа к этому боту. Свяжитесь с администратором: @frntbck", menu)
+				return handleNoAccess(c, adminUserID)
 			}
+
 			return next(c)
 		}
 	}
+}
+
+func handleNoAccess(c tele.Context, adminUserID int64) error {
+	menu := &tele.ReplyMarkup{ResizeKeyboard: true, OneTimeKeyboard: true}
+	btnAccessRequest := menu.Text("🛡️ Запросить доступ")
+	menu.Reply(menu.Row(btnAccessRequest))
+
+	c.Bot().Handle(&btnAccessRequest, func(c tele.Context) error {
+		_, err := c.Bot().Send(&tele.User{ID: adminUserID}, "Получен запрос на доступ от пользователя @"+c.Sender().Username)
+		if err != nil {
+			return c.Send("Ошибка при отправке запроса: " + err.Error())
+		}
+		c.Send("Запрос отправлен администратору.")
+		return c.Delete()
+	})
+
+	return c.Send("У вас нет доступа к этому боту. Запросите доступ или свяжитесь с администратором: @frntbck", menu)
 }
 
 func checkSubscription(channelID int64, c tele.Context) (bool, error) {

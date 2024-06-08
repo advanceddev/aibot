@@ -21,6 +21,7 @@ func main() {
 		BotID:                 cfg.BotID,
 		PaymentProviderAPIKey: cfg.PaymentProviderAPIKey,
 		ChannelID:             cfg.ChannelID,
+		AdminUserID:           cfg.AdminUserID,
 	}
 
 	defer unrealBot.Bot.Stop()
@@ -38,7 +39,7 @@ func registerHandlers(unrealBot bot.UnrealBot) {
 
 	// Создаем группу хэндлеров и добавляем мидлвэйр
 	memberOnly := unrealBot.Bot.Group()
-	memberOnly.Use(middlewares.CheckMembership(unrealBot.ChannelID))
+	memberOnly.Use(middlewares.CheckMembership(unrealBot.ChannelID, unrealBot.AdminUserID))
 
 	// Хэндлеры группы membersOnly
 	memberOnly.Handle("/start", commandHandler.StartHandler)
