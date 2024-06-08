@@ -23,3 +23,13 @@ func (h *Handler) ContactHandler(ctx tele.Context) error {
 	phone := ctx.Message().Contact.PhoneNumber
 	return ctx.Send("Записал твой номер: " + phone + "!")
 }
+
+// SubscribeHandler генерирует уникальную пригласительную ссылку на группу
+func (h *Handler) SubscribeHandler(ctx tele.Context) error {
+	channel := &tele.Chat{ID: h.bot.ChannelID, Type: "privatechannel"}
+	link, err := ctx.Bot().InviteLink(channel)
+	if err != nil {
+		return ctx.Send("Произошла ошибка при формировании пригласительной ссылки.")
+	}
+	return ctx.Send(link)
+}

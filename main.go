@@ -10,25 +10,9 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-type checkoutHandler struct {
-	bot *tele.Bot
-}
-
-var (
-	channelID    int64
-	menu         = &tele.ReplyMarkup{ResizeKeyboard: true}
-	guestMenu    = &tele.ReplyMarkup{ResizeKeyboard: true}
-	emptyMenu    = &tele.ReplyMarkup{RemoveKeyboard: true}
-	btnPromo     = menu.URL("💥 The Absolute Basstards", "@tabdnb")
-	btnPay       = menu.Text("📢 Оплатить подписку")
-	btnSubscribe = menu.Text("🎸 Подписаться")
-)
-
 func main() {
 
 	cfg := config.MustLoad()
-
-	channelID = cfg.ChannelID
 
 	unrealBot := bot.UnrealBot{
 		APIToken:              cfg.APIToken,
@@ -41,23 +25,8 @@ func main() {
 
 	defer unrealBot.Bot.Stop()
 
-	setupMenu()
-
 	registerHandlers(unrealBot)
 	unrealBot.Bot.Start()
-}
-
-func setupMenu() {
-	menu.Reply(
-		menu.Row(btnPromo),
-	)
-	guestMenu.Reply(
-		// Кнопка для оплаты
-		// guestMenu.Row(btnPay),
-
-		// Кнопка для подписки
-		guestMenu.Row(btnSubscribe),
-	)
 }
 
 func registerHandlers(unrealBot bot.UnrealBot) {
@@ -67,31 +36,17 @@ func registerHandlers(unrealBot bot.UnrealBot) {
 	messageHandler := chat.NewMessageHandler(&unrealBot)
 	commandHandler := chat.NewCommandHandler(&unrealBot)
 
-	// Создаем группу хэндлеров
+	// Создаем группу хэндлеров и добавляем мидлвэйр
 	memberOnly := unrealBot.Bot.Group()
-
-	// Добавляем мидлвару к группе хэндлеров
-	memberOnly.Use(middlewares.CheckMembership)
+	memberOnly.Use(middlewares.CheckMembership(unrealBot.ChannelID))
 
 	// Хэндлеры группы membersOnly
 	memberOnly.Handle("/start", commandHandler.StartHandler)
 	memberOnly.Handle(tele.OnContact, commandHandler.ContactHandler)
 	memberOnly.Handle(tele.OnText, messageHandler.HandleMessage)
 
+	// Публичные хэндлеры
 	unrealBot.Bot.Handle(tele.OnCheckout, checkoutHandler.HandleCheckout)
-	unrealBot.Bot.Handle(&btnPay, invoiceHandler.HandleInvoice)
-
-	// TODO: вынести хэндлер в отдельный модуль
-	unrealBot.Bot.Handle(&btnSubscribe, func(c tele.Context) error {
-		channel := &tele.Chat{ID: channelID, Type: "privatechannel"}
-		link, err := c.Bot().InviteLink(channel)
-		if err != nil {
-			return c.Send("Произошла ошибка при формировании пригласительной ссылки.")
-		}
-		return c.Send(link)
-	})
-
-	// /-- В случае успешного платежа отправляем уникальную пригласительную ссылку на канал
 	unrealBot.Bot.Handle(tele.OnPayment, invoiceHandler.HandlePaymentSuccess)
 
 }
