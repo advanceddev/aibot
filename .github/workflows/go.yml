@@ -8,8 +8,11 @@ on:
 
 jobs:
 
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
+    env:
+      SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+      SSH_HOST: ${{ secrets.SSH_HOST }}
     steps:
     - uses: actions/checkout@v4
 
@@ -21,14 +24,8 @@ jobs:
     - name: Build
       run: go build -ldflags "-w -v" cmd/main.go
 
-    - name: Upload to Server
-      uses: wei/scp-action@v2
-      with:
-        local: "./main"
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.SSH_KEY }}
-        remote: "/aibot/main"
+    - name: Copy file to server
+      run: scp -i ${{ secrets.SSH_KEY }} ./main ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/aibot/main
     - name: Run Command on Server
       uses: appleboy/ssh-action@master
       with:
