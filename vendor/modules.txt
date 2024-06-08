@@ -17,6 +17,7 @@ github.com/joho/godotenv
 # gopkg.in/telebot.v3 v3.2.1
 ## explicit; go 1.13
 gopkg.in/telebot.v3
+gopkg.in/telebot.v3/middleware
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3

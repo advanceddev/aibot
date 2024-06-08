@@ -9,6 +9,16 @@ type Handler struct {
 	bot *bot.UnrealBot
 }
 
+// GenAIUserResponse - Структура ответа информации об аккаунте GenAI
+type GenAIUserResponse struct {
+	Name            string `json:"name"`
+	Email           string `json:"email"`
+	PhoneNumber     string `json:"phone_number"`
+	Balance         string `json:"balance"`
+	EmailVerifiedAt string `json:"email_verified_at"`
+	CreatedAt       string `json:"created_at"`
+}
+
 // GenAIApiResponse - структура ответа GenAI API
 type GenAIApiResponse struct {
 	RequestID           int                  `json:"request_id"`

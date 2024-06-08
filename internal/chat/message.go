@@ -80,7 +80,7 @@ func (h *Handler) HandleMessage(ctx tele.Context) error {
 
 // createPostRequest создает POST запрос к API
 func createPostRequest(url, apiKey string, payload []byte) (*http.Request, error) {
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
+	req, err := http.NewRequest("POST", url + "/networks/chat-gpt-4-turbo", bytes.NewBuffer(payload))
 	if err != nil {
 		return nil, fmt.Errorf("Не удалось создать запрос: %w", err)
 	}

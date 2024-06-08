@@ -8,6 +8,7 @@ import (
 	"unrealbot/internal/payments"
 
 	tele "gopkg.in/telebot.v3"
+	"gopkg.in/telebot.v3/middleware"
 )
 
 func main() {
@@ -37,17 +38,22 @@ func registerHandlers(unrealBot bot.UnrealBot) {
 	messageHandler := chat.NewMessageHandler(&unrealBot)
 	commandHandler := chat.NewCommandHandler(&unrealBot)
 
-	// Создаем группу хэндлеров и добавляем мидлвэйр
+	// Создаем группу для админов и закрываем ее мидлвэйром
+	adminOnly := unrealBot.Bot.Group()
+	adminOnly.Use(middleware.Whitelist(unrealBot.AdminUserID)) 
+	adminOnly.Handle("/balance", commandHandler.BalanceHandler) // Запросить текущий баланс командой /balance
+
+	// Создаем группу для пользователей и закрываем ее мидлвэйром
 	memberOnly := unrealBot.Bot.Group()
-	memberOnly.Use(middlewares.CheckMembership(unrealBot.ChannelID, unrealBot.AdminUserID))
+	memberOnly.Use(middlewares.CheckMembership(unrealBot.ChannelID, unrealBot.AdminUserID)) // Проверить подписку и запросить доступ
 
 	// Хэндлеры группы membersOnly
-	memberOnly.Handle("/start", commandHandler.StartHandler)
-	memberOnly.Handle(tele.OnContact, commandHandler.ContactHandler)
-	memberOnly.Handle(tele.OnText, messageHandler.HandleMessage)
+	memberOnly.Handle("/start", commandHandler.StartHandler) // Обработчик команды /start
+	memberOnly.Handle(tele.OnContact, commandHandler.ContactHandler) // Обработчик на отправленный Контакт
+	memberOnly.Handle(tele.OnText, messageHandler.HandleMessage) // Обработчик текстового сообщения
 
 	// Публичные хэндлеры
-	unrealBot.Bot.Handle(tele.OnCheckout, checkoutHandler.HandleCheckout)
-	unrealBot.Bot.Handle(tele.OnPayment, invoiceHandler.HandlePaymentSuccess)
+	unrealBot.Bot.Handle(tele.OnCheckout, checkoutHandler.HandleCheckout) // Обработчик созданного платежа
+	unrealBot.Bot.Handle(tele.OnPayment, invoiceHandler.HandlePaymentSuccess) // Обработчик успешного платежа
 
 }
