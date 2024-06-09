@@ -1,4 +1,4 @@
-name: Go
+name: Audit
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  build:
+  audit:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -17,8 +17,19 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.22.4'
-
+    - name: Verify dependencies
+      run: go mod verify
     - name: Build
       run: go build -ldflags "-w -v" cmd/main.go
-    - name: Test with the Go CLI
-      run: go test ./...
+    - name: Run go vet
+      run: go vet ./...
+    - name: Install staticcheck
+      run: go install honnef.co/go/tools/cmd/staticcheck@latest
+    - name: Run staticcheck
+      run: staticcheck ./...
+    - name: Install golint
+      run: go install golang.org/x/lint/golint@latest
+    - name: Run golint
+      run: golint ./...
+    - name: Run tests
+      run: go test -race -vet=off ./...
