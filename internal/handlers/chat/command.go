@@ -59,6 +59,9 @@ func (h *Handler) RequestSubscribeHandler(ctx tele.Context) error {
 func (h *Handler) BalanceHandler(ctx tele.Context) error {
 	url := utils.SumStrings(h.bot.APIUrl, "/user")
 	parsedURL, err := utils.SanitizeURL(url)
+	if err != nil {
+		return ctx.Send("Произошла ошибка при очистке URL ", err.Error())
+	}
 	req, err := http.NewRequest("GET", parsedURL, nil)
 	if err != nil {
 		return ctx.Send("Произошла ошибка при создании запроса: ", err.Error())

@@ -39,7 +39,7 @@ func (h *Handler) HandleMessage(ctx tele.Context) error {
 
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
-		return fmt.Errorf("Ошибка маршалинга: %w", err)
+		return fmt.Errorf("ошибка маршалинга: %w", err)
 	}
 
 	req, err := createPostRequest(h.bot.APIUrl, h.bot.APIToken, payloadBytes)
@@ -54,12 +54,12 @@ func (h *Handler) HandleMessage(ctx tele.Context) error {
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("Ответ с ошибкой: %s", res.Status)
+		return fmt.Errorf("ответ с ошибкой: %s", res.Status)
 	}
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return fmt.Errorf("Не удалось прочитать ответ: %w", err)
+		return fmt.Errorf("не удалось прочитать ответ: %w", err)
 	}
 
 	apiResponse, err := parseAPIResponse(body)
@@ -89,7 +89,7 @@ func createPostRequest(apiURL, apiKey string, payload []byte) (*http.Request, er
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
 
 	if err != nil {
-		return nil, fmt.Errorf("Не удалось создать запрос: %w", err)
+		return nil, fmt.Errorf("не удалось создать запрос: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -108,7 +108,7 @@ func sendRequest(req *http.Request) (*http.Response, error) {
 func parseAPIResponse(body []byte) (*GenAIApiResponse, error) {
 	var apiResponse GenAIApiResponse
 	if err := json.Unmarshal(body, &apiResponse); err != nil {
-		return nil, fmt.Errorf("Не удалось декодировать запрос: %w", err)
+		return nil, fmt.Errorf("не удалось декодировать запрос: %w", err)
 	}
 	return &apiResponse, nil
 }
@@ -126,7 +126,7 @@ func findAssistantMessage(apiResponse *GenAIApiResponse) string {
 // handleNoAnswer обрабатывает ситуацию, когда ответ не найден
 func handleNoAnswer(ctx tele.Context) error {
 	if err := ctx.Send("К сожалению, я не знаю, что ответить... :("); err != nil {
-		return fmt.Errorf("Ответа нет и не удалось отправить: %w", err)
+		return fmt.Errorf("ответа нет и не удалось отправить: %w", err)
 	}
 
 	if err := ctx.Send(ctx.Sender().ID); err != nil {
