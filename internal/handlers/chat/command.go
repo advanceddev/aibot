@@ -38,6 +38,23 @@ func (h *Handler) SubscribeHandler(ctx tele.Context) error {
 	return ctx.Send(link)
 }
 
+// RequestSubscribeHandler обрабатывает команду /request_subscribe
+func (h *Handler) RequestSubscribeHandler(ctx tele.Context) error {
+	var senderID = ctx.Sender().Username
+	if ctx.Sender().Username == "" || ctx.Sender().Username == " " || ctx.Sender().Username == "null" {
+		senderID = string(rune(ctx.Sender().ID))
+		ctx.ForwardTo(&tele.Chat{ID: h.bot.AdminUserID})
+		return ctx.Send("У вас скрытый профиль или отсутствует имя пользователя (корокое имя) в настройках Telegram.\n\nСвяжитесь с администратором напрямую.")
+	}
+
+	_, err := ctx.Bot().Send(&tele.User{ID: h.bot.AdminUserID}, utils.SumStrings("Получен запрос на доступ от пользователя @", senderID))
+	if err != nil {
+		return ctx.Send(utils.SumStrings("Ошибка при отправке запроса: ", err.Error()))
+	}
+	ctx.Send("Запрос отправлен администратору.")
+	return ctx.Delete()
+}
+
 // BalanceHandler обрабатывает команду /balance
 func (h *Handler) BalanceHandler(ctx tele.Context) error {
 	url := utils.SumStrings(h.bot.APIUrl, "/user")

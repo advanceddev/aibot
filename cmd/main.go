@@ -47,7 +47,7 @@ func registerHandlers(unrealBot bot.UnrealBot) {
 
 	// Создаем группу для пользователей и закрываем ее мидлвэйром
 	memberOnly := unrealBot.Bot.Group()
-	memberOnly.Use(middlewares.CheckMembership(unrealBot.ChannelID, unrealBot.AdminUserID)) // Проверить подписку и запросить доступ
+	memberOnly.Use(middlewares.CheckMembership(unrealBot)) // Проверить подписку и запросить доступ
 
 	// Хэндлеры группы membersOnly
 	memberOnly.Handle("/start", commandHandler.StartHandler)         // Обработчик команды /start

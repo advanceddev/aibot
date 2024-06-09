@@ -1,23 +1,32 @@
 package middlewares
 
 import (
+	"sync"
+	"unrealbot/cmd/bot"
+	"unrealbot/internal/handlers/chat"
 	"unrealbot/internal/utils"
 
 	tele "gopkg.in/telebot.v3"
 )
 
+var chatPool = sync.Pool{
+	New: func() interface{} {
+		return &tele.Chat{}
+	},
+}
+
 // CheckMembership - мидлвейр, проверяет подписку на канал
-func CheckMembership(channelID, adminUserID int64) tele.MiddlewareFunc {
+func CheckMembership(bot bot.UnrealBot) tele.MiddlewareFunc {
 	return func(next tele.HandlerFunc) tele.HandlerFunc {
 		return func(c tele.Context) error {
 
-			isMember, err := checkSubscription(channelID, c)
+			isMember, err := checkSubscription(bot.ChannelID, c)
 			if err != nil {
 				return err
 			}
 
 			if !isMember {
-				return handleNoAccess(c, adminUserID)
+				return handleNoAccess(c, bot)
 			}
 
 			return next(c)
@@ -25,39 +34,33 @@ func CheckMembership(channelID, adminUserID int64) tele.MiddlewareFunc {
 	}
 }
 
-func handleNoAccess(c tele.Context, adminUserID int64) error {
+func handleNoAccess(c tele.Context, bot bot.UnrealBot) error {
 	menu := &tele.ReplyMarkup{ResizeKeyboard: true, OneTimeKeyboard: true}
 	btnAccessRequest := menu.Text("🛡️ Запросить доступ")
 	menu.Reply(menu.Row(btnAccessRequest))
+	cmd := chat.NewCommandHandler(&bot)
+	c.Bot().Handle(&btnAccessRequest, cmd.RequestSubscribeHandler)
 
-	c.Bot().Handle(&btnAccessRequest, func(c tele.Context) error {
-
-		var senderID = c.Sender().Username
-		if c.Sender().Username == "" || c.Sender().Username == " " || c.Sender().Username == "null" {
-			senderID = string(rune(c.Sender().ID))
-			c.ForwardTo(&tele.Chat{ID: adminUserID})
-			return c.Send("У вас скрытый профиль или отсутствует имя пользователя (корокое имя) в настройках Telegram.\n\nСвяжитесь с администратором @frntbck напрямую.")
-		}
-
-		_, err := c.Bot().Send(&tele.User{ID: adminUserID}, utils.SumStrings("Получен запрос на доступ от пользователя @", senderID))
-		if err != nil {
-			return c.Send(utils.SumStrings("Ошибка при отправке запроса: ", err.Error()))
-		}
-		c.Send("Запрос отправлен администратору.")
-		return c.Delete()
-	})
-
-	return c.Send("У вас нет доступа к этому боту. Запросите доступ или свяжитесь с администратором: @frntbck", menu)
+	// Избегаем лишнего выделения памяти для строки
+	msg := "У вас нет доступа к этому боту. Запросите доступ или свяжитесь с администратором."
+	return c.Send(msg, menu)
 }
 
+// Используем указатели для передачи объектов
 func checkSubscription(channelID int64, c tele.Context) (bool, error) {
 	user := c.Recipient()
-	channel := &tele.Chat{ID: channelID}
+
+	channel := chatPool.Get().(*tele.Chat)
+	channel.ID = channelID
 
 	chatMember, err := c.Bot().ChatMemberOf(channel, user)
 	if err != nil {
-		return false, c.Send(utils.SumStrings("Ошибка при проверке подписки: ", err.Error()))
+		errMsg := utils.SumStrings("Ошибка при проверке подписки: ", err.Error())
+		return false, c.Send(errMsg)
 	}
+
+	// Очищаем объект и возвращаем его в пул
+	chatPool.Put(channel)
 
 	return isMember(chatMember.Role), nil
 }
