@@ -7,6 +7,7 @@ github.com/BurntSushi/toml/internal
 github.com/PuerkitoBio/purell
 # github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 ## explicit
+github.com/davecgh/go-spew/spew
 # github.com/ilyakaznacheev/cleanenv v1.5.0
 ## explicit; go 1.13
 github.com/ilyakaznacheev/cleanenv
@@ -15,8 +16,10 @@ github.com/ilyakaznacheev/cleanenv
 github.com/joho/godotenv
 # github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
 ## explicit
+github.com/pmezard/go-difflib/difflib
 # github.com/stretchr/testify v1.9.0
 ## explicit; go 1.17
+github.com/stretchr/testify/assert
 # golang.org/x/net v0.26.0
 ## explicit; go 1.18
 golang.org/x/net/idna
