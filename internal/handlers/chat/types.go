@@ -42,12 +42,6 @@ type GenAIUserResponseBody struct {
 	Message      GenAIMessage `json:"message"`       // Сообщение
 }
 
-// GenAIFilterType - Структура фильтрации типа контента
-type GenAIFilterType struct {
-	Filtered bool   `json:"filtered"` // Флаг, указывающий на то, был ли контент отфильтрован
-	Severity string `json:"severity"` // Уровень серьезности фильтрации
-}
-
 // GenAIMessage - Структура сообщения
 type GenAIMessage struct {
 	Content string `json:"content"` // Содержимое сообщения

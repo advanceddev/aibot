@@ -18,17 +18,7 @@ func (h *Handler) StartHandler(ctx tele.Context) error {
 	return ctx.Send(utils.SumStrings("Привет, ", ctx.Sender().FirstName, "! 👋"), menu)
 }
 
-// SubscribeHandler генерирует уникальную пригласительную ссылку на группу
-func (h *Handler) SubscribeHandler(ctx tele.Context) error {
-	channel := &tele.Chat{ID: h.bot.ChannelID, Type: "privatechannel"}
-	link, err := ctx.Bot().InviteLink(channel)
-	if err != nil {
-		return ctx.Send("Произошла ошибка при формировании пригласительной ссылки.")
-	}
-	return ctx.Send(link)
-}
-
-// RequestSubscribeHandler обрабатывает команду /request_subscribe
+// RequestSubscribeHandler - обрабатывает запрос на подписку
 func (h *Handler) RequestSubscribeHandler(ctx tele.Context) error {
 	var senderID = ctx.Sender().Username
 	if ctx.Sender().Username == "" || ctx.Sender().Username == " " || ctx.Sender().Username == "null" {

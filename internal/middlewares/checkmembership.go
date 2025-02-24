@@ -41,7 +41,6 @@ func handleNoAccess(c tele.Context, bot bot.UnrealBot) error {
 	cmd := chat.NewCommandHandler(&bot)
 	bot.Bot.Handle(&btnAccessRequest, cmd.RequestSubscribeHandler)
 
-	// Избегаем лишнего выделения памяти для строки
 	msg := "У вас нет доступа к этому боту. Запросите доступ или свяжитесь с администратором."
 	return c.Send(msg, menu)
 }
@@ -59,7 +58,6 @@ func checkSubscription(channelID int64, c tele.Context) (bool, error) {
 		return false, c.Send(errMsg)
 	}
 
-	// Очищаем объект и возвращаем его в пул
 	chatPool.Put(channel)
 
 	return isMember(chatMember.Role), nil

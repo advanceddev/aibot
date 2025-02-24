@@ -122,10 +122,5 @@ func handleNoAnswer(ctx tele.Context) error {
 	if err := ctx.Send("К сожалению, я не знаю, что ответить... 😞"); err != nil {
 		return fmt.Errorf("ответа нет и не удалось отправить: %w", err)
 	}
-
-	if err := ctx.Send(ctx.Sender().ID); err != nil {
-		return fmt.Errorf("failed to send user ID: %w", err)
-	}
-
 	return nil
 }

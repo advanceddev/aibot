@@ -18,7 +18,6 @@ init:
 	@echo "BOT_TOKEN: ''" >> $(CONFIG_FILENAME)
 	@echo "CHANNEL_ID: -1111111111111" >> $(CONFIG_FILENAME)
 	@echo "ADMIN_USER_ID: 111111111" >> $(CONFIG_FILENAME)
-	@echo "PAYMENT_PROVIDER_API_KEY: ''" >> $(CONFIG_FILENAME)
 	@echo "" >> $(CONFIG_FILENAME)
 	@echo "API_TOKEN: ''" >> $(CONFIG_FILENAME)
 	@echo "API_URL: 'https://api.gen-api.ru/api/v1'" >> $(CONFIG_FILENAME)

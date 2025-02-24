@@ -44,7 +44,7 @@ func registerHandlers(unrealBot bot.UnrealBot) {
 	memberOnly.Use(middlewares.CheckMembership(unrealBot)) // Проверить подписку и запросить доступ
 
 	// Хэндлеры группы membersOnly
-	memberOnly.Handle("/start", commandHandler.StartHandler)         // Обработчик команды /start
-	memberOnly.Handle(tele.OnText, messageHandler.HandleMessage)     // Обработчик текстового сообщения
+	memberOnly.Handle("/start", commandHandler.StartHandler)     // Обработчик команды /start
+	memberOnly.Handle(tele.OnText, messageHandler.HandleMessage) // Обработчик текстового сообщения
 
 }
