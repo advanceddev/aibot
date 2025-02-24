@@ -36,7 +36,7 @@ func (h *Handler) HandleMessage(ctx tele.Context) error {
 		return fmt.Errorf("ошибка маршалинга: %w", err)
 	}
 
-	req, err := createPostRequest(h.bot.APIUrl, h.bot.APIToken, payloadBytes)
+	req, err := createPostRequest(h.bot.APIUrl, h.bot.APIToken, h.bot.AiModelIdentifier, payloadBytes)
 	if err != nil {
 		return err
 	}
@@ -74,12 +74,12 @@ func (h *Handler) HandleMessage(ctx tele.Context) error {
 }
 
 // createPostRequest создает POST запрос к API
-func createPostRequest(apiURL, apiKey string, payload []byte) (*http.Request, error) {
+func createPostRequest(apiURL, apiKey, aiModelIdentifier string, payload []byte) (*http.Request, error) {
 	parsedURL, err := utils.SanitizeURL(apiURL)
 	if err != nil {
 		return nil, err
 	}
-	url := utils.SumStrings(parsedURL, "/networks/o1")
+	url := utils.SumStrings(parsedURL, "/networks/", aiModelIdentifier)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
 
 	if err != nil {

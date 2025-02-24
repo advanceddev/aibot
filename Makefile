@@ -21,6 +21,7 @@ init:
 	@echo "" >> $(CONFIG_FILENAME)
 	@echo "API_TOKEN: ''" >> $(CONFIG_FILENAME)
 	@echo "API_URL: 'https://api.gen-api.ru/api/v1'" >> $(CONFIG_FILENAME)
+	@echo "AI_MODEL_IDENTIFIER: ''" >> $(CONFIG_FILENAME)
 
 # Запуск приложения в режиме разработки
 dev:

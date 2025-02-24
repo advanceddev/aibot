@@ -10,12 +10,13 @@ import (
 
 // Config - Структура конфигурации приложения
 type Config struct {
-	BotToken    string `yaml:"BOT_TOKEN" env-required:"true" env:"BOT_TOKEN"`
-	BotID       string `yaml:"BOT_ID" env:"BOT_ID"`
-	ChannelID   int64  `yaml:"CHANNEL_ID" env-required:"true" env:"CHANNEL_ID"`
-	APIToken    string `yaml:"API_TOKEN" env-required:"true" env:"API_TOKEN"`
-	APIUrl      string `yaml:"API_URL" env-required:"true" env:"API_URL"`
-	AdminUserID int64  `yaml:"ADMIN_USER_ID" env-required:"true" env:"ADMIN_USER_ID"`
+	BotToken          string `yaml:"BOT_TOKEN" env-required:"true" env:"BOT_TOKEN"`
+	BotID             string `yaml:"BOT_ID" env:"BOT_ID"`
+	ChannelID         int64  `yaml:"CHANNEL_ID" env-required:"true" env:"CHANNEL_ID"`
+	AdminUserID       int64  `yaml:"ADMIN_USER_ID" env-required:"true" env:"ADMIN_USER_ID"`
+	APIToken          string `yaml:"API_TOKEN" env-required:"true" env:"API_TOKEN"`
+	APIUrl            string `yaml:"API_URL" env-required:"true" env:"API_URL"`
+	AiModelIdentifier string `yaml:"AI_MODEL_IDENTIFIER" env-required:"true" env:"AI_MODEL_IDENTIFIER"`
 }
 
 const (

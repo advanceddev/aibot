@@ -21,6 +21,7 @@ func main() {
 		BotID:       cfg.BotID,
 		ChannelID:   cfg.ChannelID,
 		AdminUserID: cfg.AdminUserID,
+		AiModelIdentifier: cfg.AiModelIdentifier,
 	}
 
 	defer unrealBot.Bot.Stop()
