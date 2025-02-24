@@ -19,8 +19,6 @@ jobs:
         go-version: '1.22.4'
     - name: Verify dependencies
       run: go mod verify
-    - name: Build
-      run: go build -ldflags "-w -v" cmd/main.go
     - name: Run go vet
       run: go vet $(go list ./... | grep -v /vendor/)
     - name: Install golint
@@ -29,3 +27,5 @@ jobs:
       run: golint $(go list ./... | grep -v /vendor/)
     - name: Run tests
       run: go test -race -vet=off $(go list ./... | grep -v /vendor/)
+    - name: Build
+      run: go build -ldflags "-w -v" cmd/main.go
