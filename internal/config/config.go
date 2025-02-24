@@ -13,7 +13,6 @@ type Config struct {
 	BotToken              string `yaml:"BOT_TOKEN" env-required:"true" env:"BOT_TOKEN"`
 	BotID                 string `yaml:"BOT_ID" env:"BOT_ID"`
 	ChannelID             int64  `yaml:"CHANNEL_ID" env-required:"true" env:"CHANNEL_ID"`
-	PaymentProviderAPIKey string `yaml:"PAYMENT_PROVIDER_API_KEY" env-required:"true" env:"PAYMENT_PROVIDER_API_KEY"`
 	APIToken              string `yaml:"API_TOKEN" env-required:"true" env:"API_TOKEN"`
 	APIUrl                string `yaml:"API_URL" env-required:"true" env:"API_URL"`
 	AdminUserID           int64  `yaml:"ADMIN_USER_ID" env-required:"true" env:"ADMIN_USER_ID"`

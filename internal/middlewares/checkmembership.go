@@ -6,7 +6,7 @@ import (
 	"unrealbot/internal/handlers/chat"
 	"unrealbot/internal/utils"
 
-	tele "gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v4"
 )
 
 var chatPool = sync.Pool{
@@ -39,7 +39,7 @@ func handleNoAccess(c tele.Context, bot bot.UnrealBot) error {
 	btnAccessRequest := menu.Text("🛡️ Запросить доступ")
 	menu.Reply(menu.Row(btnAccessRequest))
 	cmd := chat.NewCommandHandler(&bot)
-	c.Bot().Handle(&btnAccessRequest, cmd.RequestSubscribeHandler)
+	bot.Bot.Handle(&btnAccessRequest, cmd.RequestSubscribeHandler)
 
 	// Избегаем лишнего выделения памяти для строки
 	msg := "У вас нет доступа к этому боту. Запросите доступ или свяжитесь с администратором."

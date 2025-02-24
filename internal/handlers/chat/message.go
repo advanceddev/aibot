@@ -9,7 +9,7 @@ import (
 	"unrealbot/cmd/bot"
 	"unrealbot/internal/utils"
 
-	tele "gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v4"
 )
 
 // NewMessageHandler создает новый обработчик сообщений
@@ -24,17 +24,11 @@ func (h *Handler) HandleMessage(ctx tele.Context) error {
 	payload := map[string]interface{}{
 		"messages": []map[string]interface{}{
 			{
-				"role": "user",
-				"content": []map[string]interface{}{
-					{
-						"type": "text",
-						"text": message,
-					},
-				},
+				"role":    "user",
+				"content": message,
 			},
 		},
 		"is_sync": true,
-		"model":   "gpt-4o-2024-05-13",
 	}
 
 	payloadBytes, err := json.Marshal(payload)
@@ -85,7 +79,7 @@ func createPostRequest(apiURL, apiKey string, payload []byte) (*http.Request, er
 	if err != nil {
 		return nil, err
 	}
-	url := utils.SumStrings(parsedURL, "/networks/chat-gpt-4-turbo")
+	url := utils.SumStrings(parsedURL, "/networks/o1")
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
 
 	if err != nil {
@@ -115,7 +109,7 @@ func parseAPIResponse(body []byte) (*GenAIApiResponse, error) {
 
 // findAssistantMessage находит сообщение от ассистента в API-ответе
 func findAssistantMessage(apiResponse *GenAIApiResponse) string {
-	for _, choice := range apiResponse.Choices {
+	for _, choice := range apiResponse.Response {
 		if choice.Message.Role == "assistant" {
 			return choice.Message.Content
 		}
@@ -125,7 +119,7 @@ func findAssistantMessage(apiResponse *GenAIApiResponse) string {
 
 // handleNoAnswer обрабатывает ситуацию, когда ответ не найден
 func handleNoAnswer(ctx tele.Context) error {
-	if err := ctx.Send("К сожалению, я не знаю, что ответить... :("); err != nil {
+	if err := ctx.Send("К сожалению, я не знаю, что ответить... 😞"); err != nil {
 		return fmt.Errorf("ответа нет и не удалось отправить: %w", err)
 	}
 

@@ -11,61 +11,45 @@ type Handler struct {
 
 // GenAIUserResponse - Структура ответа информации об аккаунте GenAI
 type GenAIUserResponse struct {
-	Name            string `json:"name"`
-	Email           string `json:"email"`
-	PhoneNumber     string `json:"phone_number"`
-	Balance         string `json:"balance"`
-	EmailVerifiedAt string `json:"email_verified_at"`
-	CreatedAt       string `json:"created_at"`
+	Name            string `json:"name"`              // Имя пользователя
+	Email           string `json:"email"`             // Электронная почта пользователя
+	PhoneNumber     string `json:"phone_number"`      // Номер телефона пользователя
+	Balance         string `json:"balance"`           // Баланс пользователя
+	EmailVerifiedAt string `json:"email_verified_at"` // Дата и время верификации электронной почты
+	CreatedAt       string `json:"created_at"`        // Дата и время создания аккаунта
 }
 
-// GenAIApiResponse - структура ответа GenAI API
+// GenAIApiResponse - Структура ответа GenAI API
 type GenAIApiResponse struct {
-	RequestID           int                  `json:"request_id"`
-	Model               string               `json:"model"`
-	Choices             []GenAIApiChoice     `json:"choices"`
-	PromptFilterResults []PromptFilterResult `json:"prompt_filter_results"`
-	Usage               GenAIUsage           `json:"usage"`
+	RequestID int                     `json:"request_id"` // Идентификатор запроса
+	Model     string                  `json:"model"`      // Модель, используемая для запроса
+	Cost      float64                 `json:"cost"`       // Стоимость запроса
+	Response  []GenAIUserResponseBody `json:"response"`   // Ответы от модели
+	Usage     GenAIUsage              `json:"usage"`      // Информация об использовании
 }
 
-// GenAIUsage - структура использования GenAI API
+// GenAIUsage - Структура использования GenAI API
 type GenAIUsage struct {
-	CompletionTokens int `json:"completion_tokens"`
-	PromptTokens     int `json:"prompt_tokens"`
-	TotalTokens      int `json:"total_tokens"`
+	CompletionTokens int `json:"completion_tokens"` // Количество токенов в ответе
+	PromptTokens     int `json:"prompt_tokens"`     // Количество токенов в запросе
+	TotalTokens      int `json:"total_tokens"`      // Общее количество токенов
 }
 
-// PromptFilterResult - структура поля prompt_filter_results
-type PromptFilterResult struct {
-	PromptIndex          int                       `json:"prompt_index"`
-	ContentFilterResults GenAIContentFilterResults `json:"content_filter_results"`
+// GenAIUserResponseBody - Структура варианта ответа
+type GenAIUserResponseBody struct {
+	FinishReason string       `json:"finish_reason"` // Причина завершения ответа
+	Index        int          `json:"index"`         // Индекс ответа
+	Message      GenAIMessage `json:"message"`       // Сообщение
 }
 
-// GenAIApiChoice - структура варианта ответа
-type GenAIApiChoice struct {
-	ContentFilterResults GenAIContentFilterResults `json:"content_filter_results"`
-	FinishReason         string                    `json:"finish_reason"`
-	Index                int                       `json:"index"`
-	Logprobs             interface{}               `json:"logprobs"`
-	Message              GenAIMessage              `json:"message"`
-}
-
-// GenAIContentFilterResults - структура результатов фильтрации контента
-type GenAIContentFilterResults struct {
-	Hate     GenAIFilterType `json:"hate"`
-	SelfHarm GenAIFilterType `json:"self_harm"`
-	Sexual   GenAIFilterType `json:"sexual"`
-	Violence GenAIFilterType `json:"violence"`
-}
-
-// GenAIFilterType - структура фильтрации типа контента
+// GenAIFilterType - Структура фильтрации типа контента
 type GenAIFilterType struct {
-	Filtered bool   `json:"filtered"`
-	Severity string `json:"severity"`
+	Filtered bool   `json:"filtered"` // Флаг, указывающий на то, был ли контент отфильтрован
+	Severity string `json:"severity"` // Уровень серьезности фильтрации
 }
 
-// GenAIMessage - структура сообщения
+// GenAIMessage - Структура сообщения
 type GenAIMessage struct {
-	Content string `json:"content"`
-	Role    string `json:"role"`
+	Content string `json:"content"` // Содержимое сообщения
+	Role    string `json:"role"`    // Роль отправителя сообщения
 }

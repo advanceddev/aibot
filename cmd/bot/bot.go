@@ -3,7 +3,7 @@ package bot
 import (
 	"log"
 
-	tele "gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v4"
 )
 
 // InitBot - инициализация бота и его подключение к телеграму
