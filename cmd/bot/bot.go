@@ -1,22 +1,32 @@
 package bot
 
 import (
-	"log"
+	"fmt"
+	"time"
+	"unrealbot/internal/config"
 
 	tele "gopkg.in/telebot.v4"
 )
 
-// InitBot - инициализация бота и его подключение к телеграму
-func InitBot(token string) *tele.Bot {
+// InitBot - инициализация подключения к телеграм-боту
+func InitBot(cfg *config.Config) (*UnrealBot, error) {
 	pref := tele.Settings{
-		Token:  token,
-		Poller: &tele.LongPoller{Timeout: 10},
+		Token:  cfg.BotToken,
+		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
 	}
 
 	b, err := tele.NewBot(pref)
 	if err != nil {
-		log.Fatalf("Ошибка при инициализации бота %v", err)
+		return nil, fmt.Errorf("Не удалось создать инстанс бота: %w", err)
 	}
 
-	return b
+	return &UnrealBot{
+		APIToken:          cfg.APIToken,
+		APIUrl:            cfg.APIUrl,
+		Bot:               b,
+		BotID:             cfg.BotID,
+		ChannelID:         cfg.ChannelID,
+		AdminUserID:       cfg.AdminUserID,
+		AiModelIdentifier: cfg.AiModelIdentifier,
+	}, nil
 }

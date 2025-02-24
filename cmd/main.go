@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"unrealbot/cmd/bot"
 	"unrealbot/internal/config"
 	"unrealbot/internal/handlers/chat"
@@ -14,27 +15,25 @@ func main() {
 
 	cfg := config.MustLoad()
 
-	unrealBot := bot.UnrealBot{
-		APIToken:    cfg.APIToken,
-		APIUrl:      cfg.APIUrl,
-		Bot:         bot.InitBot(cfg.BotToken),
-		BotID:       cfg.BotID,
-		ChannelID:   cfg.ChannelID,
-		AdminUserID: cfg.AdminUserID,
-		AiModelIdentifier: cfg.AiModelIdentifier,
+	unrealBot, err := bot.InitBot(cfg)
+	if err != nil {
+		log.Fatalf("Failed to initialize bot: %v", err)
 	}
 
 	defer unrealBot.Bot.Stop()
 
-	registerHandlers(unrealBot)
+	// registerHandlers(unrealBot)
+	if err := registerHandlers(unrealBot); err != nil {
+		log.Fatalf("Не удалось зарегистрировать обработчики: %v", err)
+	}
 	unrealBot.Bot.Start()
 
 }
 
-func registerHandlers(unrealBot bot.UnrealBot) {
+func registerHandlers(unrealBot *bot.UnrealBot) error {
 
-	messageHandler := chat.NewMessageHandler(&unrealBot)
-	commandHandler := chat.NewCommandHandler(&unrealBot)
+	messageHandler := chat.NewMessageHandler(unrealBot)
+	commandHandler := chat.NewCommandHandler(unrealBot)
 
 	// Создаем группу для админов и закрываем ее мидлвэйром
 	adminOnly := unrealBot.Bot.Group()
@@ -48,4 +47,5 @@ func registerHandlers(unrealBot bot.UnrealBot) {
 	memberOnly.Handle("/start", commandHandler.StartHandler)     // Обработчик команды /start
 	memberOnly.Handle(tele.OnText, messageHandler.HandleMessage) // Обработчик текстового сообщения
 
+	return nil
 }

@@ -10,13 +10,13 @@ import (
 )
 
 var chatPool = sync.Pool{
-	New: func() interface{} {
+	New: func() any {
 		return &tele.Chat{}
 	},
 }
 
 // CheckMembership - мидлвейр, проверяет подписку на канал
-func CheckMembership(bot bot.UnrealBot) tele.MiddlewareFunc {
+func CheckMembership(bot *bot.UnrealBot) tele.MiddlewareFunc {
 	return func(next tele.HandlerFunc) tele.HandlerFunc {
 		return func(c tele.Context) error {
 
@@ -34,11 +34,11 @@ func CheckMembership(bot bot.UnrealBot) tele.MiddlewareFunc {
 	}
 }
 
-func handleNoAccess(c tele.Context, bot bot.UnrealBot) error {
+func handleNoAccess(c tele.Context, bot *bot.UnrealBot) error {
 	menu := &tele.ReplyMarkup{ResizeKeyboard: true, OneTimeKeyboard: true}
 	btnAccessRequest := menu.Text("🛡️ Запросить доступ")
 	menu.Reply(menu.Row(btnAccessRequest))
-	cmd := chat.NewCommandHandler(&bot)
+	cmd := chat.NewCommandHandler(bot)
 	bot.Bot.Handle(&btnAccessRequest, cmd.RequestSubscribeHandler)
 
 	msg := "У вас нет доступа к этому боту. Запросите доступ или свяжитесь с администратором."

@@ -102,7 +102,7 @@ func sendRequest(req *http.Request) (*http.Response, error) {
 func parseAPIResponse(body []byte) (*GenAIApiResponse, error) {
 	var apiResponse GenAIApiResponse
 	if err := json.Unmarshal(body, &apiResponse); err != nil {
-		return nil, fmt.Errorf("не удалось декодировать запрос: %w", err)
+		return nil, fmt.Errorf("не удалось декодировать ответ: %w", err)
 	}
 	return &apiResponse, nil
 }
